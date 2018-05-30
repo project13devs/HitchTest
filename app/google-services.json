@@ -1,0 +1,59 @@
+{
+  "project_info": {
+    "project_number": "645219567549",
+    "firebase_url": "https://hitch-template.firebaseio.com",
+    "project_id": "hitch-template",
+    "storage_bucket": "hitch-template.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:645219567549:android:f38dec2c6a4b08c6",
+        "android_client_info": {
+          "package_name": "com.maximzedits.hitchtest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "645219567549-licpk1st56rp9tg7hblm5oi51oj41han.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.maximzedits.hitchtest",
+            "certificate_hash": "bf4fdc496dfef8249ff7179337a42c32534c3042"
+          }
+        },
+        {
+          "client_id": "645219567549-vv6h6erjgn0i4kua12ddcfsbchfqpeog.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "645219567549-vv6h6erjgn0i4kua12ddcfsbchfqpeog.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCkv9bKsuK_GJZqYOFFf8vUVDb5gzBxcNU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "645219567549-vv6h6erjgn0i4kua12ddcfsbchfqpeog.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
