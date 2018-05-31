@@ -1,33 +1,27 @@
 package com.maximzedits.hitchtest;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
 
+    private FirebaseAuth mFirebaseAuth;
+    private FirebaseAuth.AuthStateListener mAuthStateListener;
     private GoogleMap mGoogleMap;
     private FusedLocationProviderClient mFusedLocationProviderClient;
 
     //vars
-    private boolean isPermissionGranted = false;
     private Location mLastKnownLocation = null;
     
     //static publics
@@ -42,8 +36,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        //firebase initializations
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        //If user is somehow null (may be when signed out), go to login
+        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                Log.i(TAG, "onAuthStateChanged: Entered");
+                if(firebaseAuth.getCurrentUser() == null) {
+                    Log.i(TAG, "onAuthStateChanged: User logged out, intent to login activity");
+                    startActivity(new Intent(MapsActivity.this, LoginActivity.class));
+                }
+            }
+        };
+
+
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        //calls the listeners
+        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+
+    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -51,86 +69,65 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mGoogleMap = googleMap;
         mFusedLocationProviderClient = new FusedLocationProviderClient(this);
 
-        checkPermissionGranted();
 
         // Turn on the My Location layer and the related control on the map.
-        updateLocationUI();
-
-        findMyLocation();
-
-    }
-
-    private void findMyLocation() {
-        Toast.makeText(this, "Trying to get current location", Toast.LENGTH_LONG).show();
-        Log.i(TAG, "findMyLocation: Entered");
-        try {
-            if(isPermissionGranted) {
-                Task<Location> currentLocation = mFusedLocationProviderClient.getLastLocation();
-                currentLocation.addOnCompleteListener(new OnCompleteListener<Location>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Location> task) {
-                        if(task.isSuccessful()) {
-                            Log.i(TAG, "onComplete: Moving camera");
-                            mLastKnownLocation = task.getResult();
-                            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
-                        } else {
-                            Log.i(TAG, "onComplete: current location is null");
-                            Log.i(TAG, "onComplete: excepting is: " + task.getException());
-                        }
-                    }
-                });
-            }
-        } catch (SecurityException e) {
-            Log.i(TAG, "findMyLocation: Security exception: " + e);
-        }
+//        updateLocationUI();
+//
+//        findMyLocation();
 
     }
 
-    /**enable or disable ui elements**/
-    private void updateLocationUI() {
-        Log.i(TAG, "updateLocationUI: Entered");
-        if (mGoogleMap == null) {
-            Log.i(TAG, "updateLocationUI: mMap is null");
-            return;
-        }
-        try {
-            if (isPermissionGranted) {
-                Log.i(TAG, "updateLocationUI: permission granted");
-                mGoogleMap.setMyLocationEnabled(true);
-                mGoogleMap.getUiSettings().setMyLocationButtonEnabled(true);
-                mGoogleMap.getUiSettings().setZoomControlsEnabled(true);
-            } else {
-                Log.i(TAG, "updateLocationUI: permission not granted");
-                mGoogleMap.setMyLocationEnabled(false);
-                mGoogleMap.getUiSettings().setMyLocationButtonEnabled(false);
-                mLastKnownLocation = null;
-//                checkPermissionGranted();
-            }
-        } catch (SecurityException e)  {
-            Log.i(TAG, "updateLocationUI: Exception: " + e.getMessage());
-        }
-    }
+    /**Find the device's location**/
+//    private void findMyLocation() {
+//        Toast.makeText(this, "Trying to get current location", Toast.LENGTH_LONG).show();
+//        Log.i(TAG, "findMyLocation: Entered");
+//        try {
+//            if(isPermissionGranted) {
+//                Task<Location> currentLocation = mFusedLocationProviderClient.getLastLocation();
+//                currentLocation.addOnCompleteListener(new OnCompleteListener<Location>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<Location> task) {
+//                        if(task.isSuccessful()) {
+//                            Log.i(TAG, "onComplete: Moving camera");
+//                            mLastKnownLocation = task.getResult();
+//                            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+//                        } else {
+//                            Log.i(TAG, "onComplete: current location is null");
+//                            Log.i(TAG, "onComplete: excepting is: " + task.getException());
+//                        }
+//                    }
+//                });
+//            }
+//        } catch (SecurityException e) {
+//            Log.i(TAG, "findMyLocation: Security exception: " + e);
+//        }
+//
+//    }
 
-    private void checkPermissionGranted() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            isPermissionGranted = true;
-        } else {
-            String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};
-            ActivityCompat.requestPermissions(this, permissions, 1234);
-        }
-    }
+    /**enable or disable ui elements, when permission is granted**/
+//    private void updateLocationUI() {
+//        Log.i(TAG, "updateLocationUI: Entered");
+//        if (mGoogleMap == null) {
+//            Log.i(TAG, "updateLocationUI: mMap is null");
+//            return;
+//        }
+//        try {
+//            if (isPermissionGranted) {
+//                Log.i(TAG, "updateLocationUI: permission granted");
+//                mGoogleMap.setMyLocationEnabled(true);
+//                mGoogleMap.getUiSettings().setMyLocationButtonEnabled(true);
+//                mGoogleMap.getUiSettings().setZoomControlsEnabled(true);
+//            } else {
+//                Log.i(TAG, "updateLocationUI: permission not granted");
+//                Toast.makeText(this, "Please allow required permissions to continue", Toast.LENGTH_SHORT).show();
+//                mGoogleMap.setMyLocationEnabled(false);
+//                mGoogleMap.getUiSettings().setMyLocationButtonEnabled(false);
+//                mLastKnownLocation = null;
+//            }
+//        } catch (SecurityException e)  {
+//            Log.i(TAG, "updateLocationUI: Exception: " + e.getMessage());
+//        }
+//    }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        Log.i(TAG, "onRequestPermissionsResult: Entered");
-        isPermissionGranted = false;
-        if(requestCode == 1234 && grantResults.length > 0) {
-            if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                isPermissionGranted = true;
-                updateLocationUI();
-                findMyLocation();
-            }
-        }
 
-    }
 }

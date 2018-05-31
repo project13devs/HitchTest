@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">Hitch Test</string>
     <string name="title_activity_maps">Map</string>
+    <string name="permission_warning">It appears that you are not granted permission for LOCATION ACCESS. Allow permissions to sign in</string>
+    <string name="allow_permssions">Allow Permssions</string>
 </resources>

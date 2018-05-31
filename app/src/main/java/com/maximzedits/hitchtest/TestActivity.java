@@ -1,5 +1,6 @@
 package com.maximzedits.hitchtest;
 
+import android.Manifest;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -15,6 +16,7 @@ public class TestActivity extends AppCompatActivity {
     private FirebaseUser mFirebaseUser;
 
     public static final String TAG = "TAG_INFORMATION";
+    public static final String[] PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION};
 
     Button mSignoutButton;
 
@@ -27,6 +29,8 @@ public class TestActivity extends AppCompatActivity {
 
         mSignoutButton = findViewById(R.id.signoutBtn);
     }
+
+
 
     @Override
     protected void onStart() {
